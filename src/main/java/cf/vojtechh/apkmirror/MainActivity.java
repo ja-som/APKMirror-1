@@ -163,7 +163,6 @@ public class MainActivity extends AppCompatActivity  {
             mWebView.clearHistory();
         }
 
-
         if (javascriptSwitch){
 
             mWebView.getSettings().setJavaScriptEnabled(false);
@@ -179,11 +178,12 @@ public class MainActivity extends AppCompatActivity  {
                 getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
             }
         }
+
         if (orientationSwitch){
-            setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
         else {
-            setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+            setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
         mWebView.setDownloadListener(new DownloadListener() {
