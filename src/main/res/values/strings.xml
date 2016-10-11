@@ -12,15 +12,15 @@
     <string name="option4">Show title in downloading notification</string>
     <string name="option4desc">A setting whether to show the file name(disabled) or show the title(enabled) in downloading notification</string>
     <string name="settingsrestart">Restarting</string>
-    <string name="warningsettings">Please keep in mind that this feature is little buggy so if something doesnt work as expected please delete app data</string>
     <string name="use_dark_theme">Use dark theme</string>
     <string name="for_those_who_want_to_join_the_dark_side">For those who want to join the dark side</string>
     <string name="developers">Developers</string>
     <string name="latest_uploads">Latest uploads</string>
-    <string name="option6">Use hardware acceleration</string>
-    <string name="option6desc">Makes loading time faster</string>
+    <string name="option6">Allow screen rotation</string>
+    <string name="option6desc">Rotate the screen on change orientation</string>
     <string name="download">Downloaded</string>
     <string name="open">Open</string>
     <string name="error">Error</string>
+
 
 </resources>

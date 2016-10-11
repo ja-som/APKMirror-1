@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -138,6 +139,7 @@ public class MainActivity extends AppCompatActivity  {
             editor.putBoolean("navcolor", true);
             editor.putBoolean("title", false);
             editor.putBoolean("dark", false);
+            editor.putBoolean("orientation", false);
             editor.apply();
         }
 
@@ -146,6 +148,7 @@ public class MainActivity extends AppCompatActivity  {
         boolean javascriptSwitch = prefs.getBoolean("javascript", false);
         boolean navbarSwitch = prefs.getBoolean("navcolor", true);
         final boolean titleSwitch = prefs.getBoolean("title", false);
+        boolean orientationSwitch = prefs.getBoolean("orientation", false);
 
         if(cacheSwitch){
             mWebView.getSettings().setAppCacheEnabled(false);
@@ -175,6 +178,12 @@ public class MainActivity extends AppCompatActivity  {
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
             }
+        }
+        if (orientationSwitch){
+            setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        else {
+            setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_SENSOR);
         }
 
         mWebView.setDownloadListener(new DownloadListener() {

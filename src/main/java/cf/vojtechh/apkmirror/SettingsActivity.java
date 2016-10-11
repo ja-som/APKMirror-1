@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -53,12 +54,14 @@ public class SettingsActivity extends AppCompatActivity {
         final Switch option3switch = (Switch) findViewById(R.id.optionswitch3);
         final Switch option4switch = (Switch) findViewById(R.id.optionswitch4);
         final Switch option5switch = (Switch) findViewById(R.id.optionswitch5);
+        final Switch option6switch = (Switch) findViewById(R.id.optionswitch6);
 
         option1switch.setChecked(sharedPrefs.getBoolean("cache", true));
         option2switch.setChecked(sharedPrefs.getBoolean("javascript", true));
         option3switch.setChecked(sharedPrefs.getBoolean("navcolor", false));
         option4switch.setChecked(sharedPrefs.getBoolean("title", true));
         option5switch.setChecked(sharedPrefs.getBoolean("dark", true));
+        option6switch.setChecked(sharedPrefs.getBoolean("orientation", true));
 
         //setting switch1
 
@@ -127,6 +130,19 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             }
         });
+        option6switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    orientationEnabled();
+                    setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                }else{
+                    orientationDisabled();
+                    setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                }
+            }
+        });
 
     }
 
@@ -163,6 +179,7 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = getSharedPreferences("cf.vojtechh.apkmirror", MODE_PRIVATE).edit();
         editor.putBoolean("navcolor", true);
         editor.apply();
+        recreate();
 
     }
 
@@ -170,6 +187,7 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = getSharedPreferences("cf.vojtechh.apkmirror", MODE_PRIVATE).edit();
         editor.putBoolean("navcolor", false);
         editor.apply();
+        recreate();
 
     }
 
@@ -194,13 +212,31 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = getSharedPreferences("cf.vojtechh.apkmirror", MODE_PRIVATE).edit();
         editor.putBoolean("dark", true);
         editor.apply();
-
+        this.setTheme(R.style.DarkSettings);
+        recreate();
     }
 
     public void darkDisabled() {
 
         SharedPreferences.Editor editor = getSharedPreferences("cf.vojtechh.apkmirror", MODE_PRIVATE).edit();
         editor.putBoolean("dark", false);
+        editor.apply();
+        this.setTheme(R.style.Settings);
+        recreate();
+    }
+
+    public void orientationEnabled() {
+
+        SharedPreferences.Editor editor = getSharedPreferences("cf.vojtechh.apkmirror", MODE_PRIVATE).edit();
+        editor.putBoolean("orientation", true);
+        editor.apply();
+
+    }
+
+    public void orientationDisabled() {
+
+        SharedPreferences.Editor editor = getSharedPreferences("cf.vojtechh.apkmirror", MODE_PRIVATE).edit();
+        editor.putBoolean("orientation", false);
         editor.apply();
 
     }

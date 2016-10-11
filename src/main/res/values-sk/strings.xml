@@ -13,13 +13,12 @@
     <string name="option4">Zobraziť názov aplikácie v upozornení</string>
     <string name="option4desc">Pri sťahovaní zobrazí názov aplikácie namiesto názvu súboru.</string>
     <string name="settingsrestart">Reštartovanie</string>
-    <string name="warningsettings">Prosím, berte na vedomie, že táto funkcia môže mať chyby, ak sa vyskytnú problémy, vymažte dáta aplikácie.</string>
     <string name="use_dark_theme">Použiť tmavú tému</string>
     <string name="for_those_who_want_to_join_the_dark_side">Pre tých, ktorí sa chcú pridať na temnú stranu.</string>
     <string name="developers">Vývojári</string>
     <string name="latest_uploads">Najnovšie pridané</string>
-    <string name="option6desc">Zrýchli načítanie</string>
-    <string name="option6">Používať Hardvérovú akceleráciu</string>
+    <string name="option6desc">Otočenie displeja na zmenu orientácie</string>
+    <string name="option6">Povoliť otáčania obrazovky</string>
     <string name="download">Stiahnuté</string>
     <string name="open">Otvoriť</string>
     <string name="error">Chyba</string>
