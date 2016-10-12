@@ -3,6 +3,7 @@ package cf.vojtechh.apkmirror;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -18,6 +19,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -32,6 +34,7 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -46,6 +49,9 @@ import com.roughike.bottombar.OnTabReselectListener;
 import com.roughike.bottombar.OnTabSelectListener;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity  {
     private final static int REQUEST_WRITE_STORAGE_RESULT = 112;
@@ -53,8 +59,47 @@ public class MainActivity extends AppCompatActivity  {
     private SwipeRefreshLayout swipeRefreshLayout;
     public ProgressBar Pbar;
     String url;
-    private static final String TAG = "mWebView";
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private String mCM;
+    private ValueCallback<Uri> mUM;
+    private ValueCallback<Uri[]> mUMA;
+    private final static int FCR=1;
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent){
+        super.onActivityResult(requestCode, resultCode, intent);
+        if(Build.VERSION.SDK_INT >= 21){
+            Uri[] results = null;
+            //Check if response is positive
+            if(resultCode== Activity.RESULT_OK){
+                if(requestCode == FCR){
+                    if(null == mUMA){
+                        return;
+                    }
+                    if(intent == null){
+                        //if no file available
+                        if(mCM != null){
+                            results = new Uri[]{Uri.parse(mCM)};
+                        }
+                    }else{
+                        String dataString = intent.getDataString();
+                        if(dataString != null){
+                            results = new Uri[]{Uri.parse(dataString)};
+                        }
+                    }
+                }
+            }
+            mUMA.onReceiveValue(results);
+            mUMA = null;
+        }else{
+            if(requestCode == FCR){
+                if(null == mUM) return;
+                Uri result = intent == null || resultCode != RESULT_OK ? null : intent.getData();
+                mUM.onReceiveValue(result);
+                mUM = null;
+            }
+        }
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
 
@@ -62,22 +107,21 @@ public class MainActivity extends AppCompatActivity  {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Pbar = (ProgressBar) findViewById(R.id.loading);
+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
             ActivityManager.TaskDescription taskDesc = new ActivityManager.TaskDescription(getString(R.string.app_name), bm, getResources().getColor(R.color.Recents));
             this.setTaskDescription(taskDesc);
         }
-
+        //all of the recources
+        Pbar = (ProgressBar) findViewById(R.id.loading);
         final ImageButton settingsbutt = (ImageButton) findViewById(R.id.settingsButton);
 
-        //settings button onclick listener
         settingsbutt.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 openSettings();
             }
         });
-
         //checking for permission
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {}
@@ -191,27 +235,25 @@ public class MainActivity extends AppCompatActivity  {
             public void onDownloadStart(final String url, final String userAgent, final String contentDisposition, final String mimetype, final long contentLength) {
                 final String fileName = URLUtil.guessFileName(url, contentDisposition, mimetype);
                 android.util.Log.d("Applog", "fileName:" + fileName);
-                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                final DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
                 request.setMimeType("application/vnd.android.package-archive");
                 DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                 final String dwn = getResources().getString(R.string.download);
                 final View.OnClickListener opendown = new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (titleSwitch){
-                            String regex = "\\bAPK\\b";
-                            String regex2 = "\\bDownload\\b\\s*";
-                            String title = mWebView.getTitle();
-                            String title1 = title.replaceAll(regex, "");
-                            String title2 = title1.replaceAll(regex2, "");
-                            File apkfile = new File(Environment.getExternalStorageDirectory().getPath() + "/" + Environment.DIRECTORY_DOWNLOADS  + title2 + ".apk");
+                            File apkfile = new File(Environment.getExternalStorageDirectory().getPath() + "/" + Environment.DIRECTORY_DOWNLOADS + "/" + fileName);
+
                             Intent i = new Intent();
                             i.setAction(android.content.Intent.ACTION_VIEW);
                             i.setDataAndType(Uri.fromFile(apkfile), "application/vnd.android.package-archive");
                             startActivity(i);
 
                         }else {
-                            File apkfile = new File(Environment.getExternalStorageDirectory().getPath() + "/" + Environment.DIRECTORY_DOWNLOADS + fileName);
+                            File apkfile = new File(Environment.getExternalStorageDirectory().getPath() + "/" + Environment.DIRECTORY_DOWNLOADS + "/" + fileName);
+
                             Intent i = new Intent();
                             i.setAction(android.content.Intent.ACTION_VIEW);
                             i.setDataAndType(Uri.fromFile(apkfile), "application/vnd.android.package-archive");
@@ -229,19 +271,19 @@ public class MainActivity extends AppCompatActivity  {
                             String title2 = title1.replaceAll(regex2, "");
 
                             Snackbar.make(findViewById(android.R.id.content), dwn + " " + title2, Snackbar.LENGTH_LONG)
-                                    //.setAction(R.string.open, opendown)
+                                    .setAction(R.string.open, opendown)
                                     .show();
 
                         }else {
                             Snackbar.make(findViewById(android.R.id.content), dwn + " " + fileName , Snackbar.LENGTH_LONG)
-                                    //.setAction(R.string.open, opendown)
+
+                                    .setAction(R.string.open, opendown)
                                     .show();
                         }
                     }
                 };
                 registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                 if (titleSwitch){
                     String regex = "\\bAPK\\b";
                     String regex2 = "\\bDownload\\b\\s*";
@@ -254,7 +296,6 @@ public class MainActivity extends AppCompatActivity  {
                 }
 
                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-
                 manager.enqueue(request);
             }
         });
@@ -366,9 +407,35 @@ public class MainActivity extends AppCompatActivity  {
                     Pbar.setVisibility(ProgressBar.GONE);
                 }
         }
+        //For Android 4.1+
+        public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture){
+            mUM = uploadMsg;
+            Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+            i.addCategory(Intent.CATEGORY_OPENABLE);
+            i.setType("application/vnd.android.package-archive");
+            MainActivity.this.startActivityForResult(Intent.createChooser(i, "File Chooser"), MainActivity.FCR);
+        }
+        //For Android 5.0+
+        public boolean onShowFileChooser(
+                WebView webView, ValueCallback<Uri[]> filePathCallback,
+                WebChromeClient.FileChooserParams fileChooserParams){
+            if(mUMA != null){
+                mUMA.onReceiveValue(null);
+            }
+            mUMA = filePathCallback;
+            Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            contentSelectionIntent.setType("application/vnd.android.package-archive");
+            Intent[] intentArray;
+            Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+            chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
+            chooserIntent.putExtra(Intent.EXTRA_TITLE, "Choose APK");
+            startActivityForResult(chooserIntent, FCR);
+            return true;
+        }
     }
 
-    //settings start function
+    //settings opening
     public void openSettings(){
         Intent i = new Intent
                 (MainActivity.this, SettingsActivity.class);
@@ -398,7 +465,6 @@ public class MainActivity extends AppCompatActivity  {
         }
         return super.onKeyLongPress(keyCode, event);
     }
-
 
     //requesting the permission to write to external storage
     @Override
