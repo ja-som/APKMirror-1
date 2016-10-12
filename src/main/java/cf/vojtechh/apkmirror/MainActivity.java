@@ -263,23 +263,9 @@ public class MainActivity extends AppCompatActivity  {
                 };
                 BroadcastReceiver onComplete=new BroadcastReceiver() {
                     public void onReceive(Context ctxt, Intent intent) {
-                        if (titleSwitch){
-                            String regex = "\\bAPK\\b";
-                            String regex2 = "\\bDownload\\b\\s*";
-                            String title = mWebView.getTitle();
-                            String title1 = title.replaceAll(regex, "");
-                            String title2 = title1.replaceAll(regex2, "");
-
-                            Snackbar.make(findViewById(android.R.id.content), dwn + " " + title2, Snackbar.LENGTH_LONG)
-                                    .setAction(R.string.open, opendown)
-                                    .show();
-
-                        }else {
-                            Snackbar.make(findViewById(android.R.id.content), dwn + " " + fileName , Snackbar.LENGTH_LONG)
-
-                                    .setAction(R.string.open, opendown)
-                                    .show();
-                        }
+                        Snackbar.make(findViewById(android.R.id.content), dwn + " " + fileName , Snackbar.LENGTH_LONG)
+                                .setAction(R.string.open, opendown)
+                                .show();
                     }
                 };
                 registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
