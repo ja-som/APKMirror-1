@@ -17,8 +17,8 @@
     <string name="for_those_who_want_to_join_the_dark_side">Pre tých, ktorí sa chcú pridať na temnú stranu.</string>
     <string name="developers">Vývojári</string>
     <string name="latest_uploads">Najnovšie pridané</string>
-    <string name="option6desc">Otočenie displeja na zmenu orientácie</string>
-    <string name="option6">Povoliť otáčania obrazovky</string>
+    <string name="option6desc">Otočiť obsah obrazovky pri zmene orientácie</string>
+    <string name="option6">Povoliť otáčanie obrazovky</string>
     <string name="download">Stiahnuté</string>
     <string name="open">Otvoriť</string>
     <string name="error">Chyba</string>
