@@ -25,11 +25,17 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SharedPreferences sharedPrefs = getSharedPreferences("cf.vojtechh.apkmirror", MODE_PRIVATE);
         boolean darkSwitch = sharedPrefs.getBoolean("dark", true);
+        boolean orientationSwitch = sharedPrefs.getBoolean("orientation", true);
         if(darkSwitch){
             this.setTheme(R.style.DarkSettings);
         }
         else{
             this.setTheme(R.style.Settings);
+        }if(orientationSwitch){
+            setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        }
+        else{
+            setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
         setContentView(R.layout.activity_settings);
 

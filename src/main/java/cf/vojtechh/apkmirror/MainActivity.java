@@ -19,7 +19,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -29,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -49,9 +49,11 @@ import com.roughike.bottombar.OnTabReselectListener;
 import com.roughike.bottombar.OnTabSelectListener;
 
 import java.io.File;
+
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity  {
     private final static int REQUEST_WRITE_STORAGE_RESULT = 112;
@@ -107,6 +109,7 @@ public class MainActivity extends AppCompatActivity  {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
@@ -263,7 +266,7 @@ public class MainActivity extends AppCompatActivity  {
                 };
                 BroadcastReceiver onComplete=new BroadcastReceiver() {
                     public void onReceive(Context ctxt, Intent intent) {
-                        Snackbar.make(findViewById(android.R.id.content), dwn + " " + fileName , Snackbar.LENGTH_LONG)
+                        Snackbar.make(findViewById(R.id.snackbar_place), dwn + " " + fileName , Snackbar.LENGTH_LONG)
                                 .setAction(R.string.open, opendown)
                                 .show();
                     }
@@ -286,39 +289,6 @@ public class MainActivity extends AppCompatActivity  {
             }
         });
 
-        //initializing bottom bar
-        BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
-        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
-            @Override
-            public void onTabSelected(@IdRes int tabId) {
-                if (tabId == R.id.tab_homepage) {
-                    if (findViewById(R.id.splash_screen).getVisibility() == View.VISIBLE) {
-                        return;
-                    }
-                    if (findViewById(R.id.splash_screen).getVisibility() == View.GONE) {
-                        mWebView.loadUrl(url);
-                    }
-                    mWebView.loadUrl(url);
-                }if (tabId == R.id.tab_devs) {
-                    mWebView.loadUrl("http://www.apkmirror.com/developers/");
-                }if (tabId == R.id.tab_upload) {
-                    mWebView.loadUrl("http://www.apkmirror.com/uploads/");
-                }
-            }
-        });
-        bottomBar.setOnTabReselectListener(new OnTabReselectListener() {
-            @Override
-            public void onTabReSelected(@IdRes int tabId) {
-                if (tabId == R.id.tab_homepage) {
-                    mWebView.scrollTo(0,0);
-                }if (tabId == R.id.tab_devs) {
-                    mWebView.scrollTo(0,0);
-                }if (tabId == R.id.tab_upload) {
-                    mWebView.scrollTo(0,0);
-                }
-            }
-        });
-
     }
     private class mWebClient extends WebViewClient {
         @Override
@@ -337,6 +307,7 @@ public class MainActivity extends AppCompatActivity  {
         public void onPageStarted(WebView view, String url, Bitmap favicon)
         {
             findViewById(R.id.loading).setVisibility(View.VISIBLE);
+            //changeStatusBarColor();
         }
         @SuppressWarnings("deprecation")
         @Override
@@ -384,14 +355,14 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     private class mChromeClient extends WebChromeClient {
-            public void onProgressChanged(WebView view, int progress) {
-                if(progress < 100 && Pbar.getVisibility() == ProgressBar.GONE){
-                    Pbar.setVisibility(ProgressBar.VISIBLE);
-                }
-                Pbar.setProgress(progress);
-                if(progress == 100) {
-                    Pbar.setVisibility(ProgressBar.GONE);
-                }
+        public void onProgressChanged(WebView view, int progress) {
+            if(progress < 100 && Pbar.getVisibility() == ProgressBar.GONE){
+                Pbar.setVisibility(ProgressBar.VISIBLE);
+            }
+            Pbar.setProgress(progress);
+            if(progress == 100) {
+                Pbar.setVisibility(ProgressBar.GONE);
+            }
         }
         //For Android 4.1+
         public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture){
@@ -430,6 +401,39 @@ public class MainActivity extends AppCompatActivity  {
         finish();
 
     }
+    //Status bar color
+    public void  changeStatusBarColor(){
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Connection.Response response = null;
+            try {
+                response = Jsoup.connect(mWebView.getUrl())
+                        .method(Connection.Method.POST)
+                        .followRedirects(true)
+                        .execute();
+                org.jsoup.nodes.Document document = Jsoup.connect(mWebView.getUrl())
+                        .cookies(response.cookies())
+                        .get();
+                final org.jsoup.nodes.Element titleElement= document.select("meta[name=\"theme-color\"]").first();
+                String title = titleElement.toString();
+                int websitecolor = Integer.parseInt(title);
+                Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+                ActivityManager.TaskDescription taskDesc = new ActivityManager.TaskDescription(title, bm, websitecolor);
+                this.setTaskDescription(taskDesc);
+                Window window = this.getWindow();
+                // clear FLAG_TRANSLUCENT_STATUS flag:
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                // finally change the color
+                window.setStatusBarColor(websitecolor);
+                Toast.makeText(this, title, Toast.LENGTH_LONG).show();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     //back key
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -466,7 +470,7 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     public void createBottomBar(){
-        BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
+        final BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
@@ -477,11 +481,12 @@ public class MainActivity extends AppCompatActivity  {
                     if (findViewById(R.id.splash_screen).getVisibility() == View.GONE) {
                         mWebView.loadUrl("http://www.apkmirror.com/");
                     }
-                    mWebView.loadUrl("http://www.apkmirror.com/");
                 }if (tabId == R.id.tab_devs) {
                     mWebView.loadUrl("http://www.apkmirror.com/developers/");
                 }if (tabId == R.id.tab_upload) {
-                    mWebView.loadUrl("http://www.apkmirror.com/uploads/");
+                    mWebView.loadUrl("http://www.apkmirror.com/apk-upload/");
+                }if (tabId == R.id.tab_settings) {
+                    openSettings();
                 }
             }
         });

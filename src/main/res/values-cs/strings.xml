@@ -16,10 +16,11 @@
     <string name="for_those_who_want_to_join_the_dark_side">Pro ty co se chtějí připojit na temnou stranu</string>
     <string name="use_dark_theme">Používat tmavý motiv</string>
     <string name="developers">Vývojáři</string>
-    <string name="latest_uploads">Poslední uploudy</string>
+    <string name="latest_uploads">Nahrát</string>
     <string name="option6desc">Obrazovka se otočí pokud se otočí zařízení</string>
     <string name="option6">Povolit otáčení obrazovky</string>
     <string name="download">Staženo</string>
     <string name="open">Otevřít</string>
     <string name="error">Chyba</string>
+    <string name="settings">Nastavení</string>
 </resources>

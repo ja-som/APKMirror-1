@@ -15,12 +15,13 @@
     <string name="use_dark_theme">Use dark theme</string>
     <string name="for_those_who_want_to_join_the_dark_side">For those who want to join the dark side</string>
     <string name="developers">Developers</string>
-    <string name="latest_uploads">Latest uploads</string>
+    <string name="latest_uploads">Upload</string>
     <string name="option6">Allow screen rotation</string>
     <string name="option6desc">Rotate the screen on change orientation</string>
     <string name="download">Downloaded</string>
     <string name="open">Open</string>
     <string name="error">Error</string>
+    <string name="settings">Settings</string>
 
 
 </resources>

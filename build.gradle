@@ -8,8 +8,8 @@ android {
         applicationId "cf.vojtechh.apkmirror"
         minSdkVersion 19
         targetSdkVersion 24
-        versionCode 8
-        versionName "2.0"
+        versionCode 9
+        versionName "2.1"
     }
     buildTypes {
         release {
@@ -27,4 +27,7 @@ dependencies {
     compile 'com.roughike:bottom-bar:2.0.2'
     compile 'com.android.support:support-v4:24.2.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'
+    compile 'net.htmlparser.jericho:jericho-html:3.3'
+    compile 'org.jsoup:jsoup:1.7.3'
+    compile 'it.sephiroth.android.library.bottomnavigation:bottom-navigation:1.0.7'
 }
